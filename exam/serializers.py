@@ -66,9 +66,6 @@ class QuestionTypeSerializer(serializers.ModelSerializer):
 
 #serializer to validate Question data
 class QuestionSerializer(serializers.ModelSerializer):
-    
-    # difficulty_level = serializers.StringRelatedField()
-    # question_type = serializers.ChoiceField(choices=QuestionType.objects.values_list('id', 'question_type'), required  =False)
     class Meta:
         model = Questions
         fields = ['id','difficulty_level', 'question_type', 'questions_text', 'questions_image', 'optionA_text', 'optionA_image', 'optionB_text', 'optionB_image', 'optionC_text', 'optionC_image', 'optionD_text', 'optionD_image', 'choose', 'answer', 'solution_text', 'solution_image']
@@ -77,7 +74,6 @@ class QuestionSerializer(serializers.ModelSerializer):
 #serializer to validate Exam data
 class ExamSerializer(serializers.ModelSerializer):
     questions_count = serializers.SerializerMethodField()
-    # questions = QuestionSerializer(many = True, read_only = True)
     class Meta:
         model = Exam
         fields = ['id', 'exam_id','exam_name', 'duration', 'instructions', 'total_marks', 'qualify_score', 'postive_marks', 'negetive_marks','start_date', 'end_date','is_active', 'created_date', 'updated_date','questions', 'questions_count']
