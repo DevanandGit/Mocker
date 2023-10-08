@@ -5,8 +5,7 @@ from .serializers import (RegularUserSerializer, QuestionSerializer, ExamSeriali
                           ChangePasswordSerializer,ResetPasswordEmailSerializer,
                           ResetPasswordSerializer,CheckOTPSerializer,
                           UserProfileSerializer, UserResponseSerializer,
-                          DifficultyLevelSerializer, QuestionTypeSerializer, 
-                          ExamDetailSerializer, SliderImageSerializer)
+                          DifficultyLevelSerializer, QuestionTypeSerializer, ExamDetailSerializer, SliderImageSerializer)
 from rest_framework.generics import (CreateAPIView, ListCreateAPIView, 
                             RetrieveUpdateDestroyAPIView, GenericAPIView, 
                             RetrieveAPIView, ListAPIView)

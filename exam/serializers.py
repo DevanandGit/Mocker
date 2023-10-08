@@ -74,6 +74,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 #serializer to validate Exam data
 class ExamSerializer(serializers.ModelSerializer):
     questions_count = serializers.SerializerMethodField()
+    # questions = QuestionSerializer(many = True, read_only = True)
     class Meta:
         model = Exam
         fields = ['id', 'exam_id','exam_name', 'duration', 'instructions', 'total_marks', 'qualify_score', 'postive_marks', 'negetive_marks','start_date', 'end_date','is_active', 'created_date', 'updated_date','questions', 'questions_count']
