@@ -88,10 +88,10 @@ DATABASES = {
         'PORT': '5432',           # Leave it empty for default PostgreSQL port (5432)
     },
 
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
     
 }
 
