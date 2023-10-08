@@ -80,9 +80,19 @@ WSGI_APPLICATION = 'Mocker.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mocker',
+        'USER': 'dbdevanand',
+        'PASSWORD': 'dbdevanand',
+        'HOST': '193.203.163.77',  # or the IP address of your VPS
+        'PORT': '5432',           # Leave it empty for default PostgreSQL port (5432)
+    },
+
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+    
 }
 
 
@@ -122,9 +132,10 @@ AUTH_USER_MODEL = 'exam.RegularUser'
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = '/usr/local/lsws/Example/html/Mocker/public/static/'
+STATIC_ROOT = '/usr/local/lsws/Mocker/myenv/Mocker/public/static/'
+
 MEDIA_URL = 'media/'
-MEDIA_ROOT = '/usr/local/lsws/Example/html/Mocker/public/media/'
+MEDIA_ROOT = '/usr/local/lsws/Mocker/myenv/Mocker/public/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
