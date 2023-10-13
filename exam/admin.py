@@ -1,8 +1,18 @@
 from django.contrib import admin
-from .models import Questions, Exam, DifficultyLevel, QuestionType, Otp, UserProfile, PurchasedDate, UserResponse, SliderImage
+from .models import RegularUser,Questions, Exam, DifficultyLevel, QuestionType, Otp, UserProfile, PurchasedDate, UserResponse, SliderImage
 # Register your models here.
 
-admin.site.register(Questions)
+class QuestionsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'questions_text', 'added_by')
+
+    def save_model(self, request, obj, form, change):
+        if not obj.added_by:
+            obj.added_by = request.user
+        obj.save()
+
+admin.site.register(Questions, QuestionsAdmin)
+
+admin.site.register(RegularUser)
 admin.site.register(Exam)
 admin.site.register(DifficultyLevel)
 admin.site.register(QuestionType)

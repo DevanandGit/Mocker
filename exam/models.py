@@ -18,7 +18,7 @@ class RegularUser(AbstractUser):
             MinValueValidator(1, message="Value must be between 1 and 8"),
             MaxValueValidator(8, message="Value must be between 1 and 8"),
         ], null=True)
-
+    no_of_questions_added = models.PositiveIntegerField(default = 0)
     USERNAME_FIELD = 'username'
     class Meta:
         db_table = 'exam_RegularUser'
@@ -46,9 +46,11 @@ class QuestionType(models.Model):
 #model to add Questions
 class Questions(models.Model):
     id = models.BigAutoField(unique=True, primary_key=True)
+    added_by = models.ForeignKey(RegularUser, on_delete = models.SET_NULL, null = True, editable=False)
     difficulty_level = models.ForeignKey(DifficultyLevel, on_delete=models.SET_NULL, null=True)
     question_type = models.ForeignKey(QuestionType, on_delete=models.SET_NULL, null=True)
     questions_text = models.TextField(blank=True, null=True)
+    questions_text_slug = models.TextField(blank = True, null = True, unique=True, editable = False)
     questions_image = models.ImageField(upload_to='questions/images/', blank=True, null=True) #need to specify the destination in settings.py
     optionA_text = models.TextField(blank=True, null=True)
     optionA_image = models.ImageField(upload_to='questions/images/', blank=True, null=True)
@@ -60,8 +62,8 @@ class Questions(models.Model):
     optionD_image = models.ImageField(upload_to='questions/images/', blank=True, null=True)
     choose = (('A', 'optionA'), ('B', 'optionB'), ('C', 'optionC'), ('D', 'optionD'))
     answer = models.CharField(max_length=1,choices=choose)
-    solution_text = models.TextField(blank=True, null=True, editable=False)
-    solution_image = models.ImageField(upload_to='questions/images/', blank=True, null=True, editable=False)
+    solution_text = models.TextField(blank=True, null=True, editable=True)
+    solution_image = models.ImageField(upload_to='questions/images/', blank=True, null=True, editable=True)
     
     def save(self, *args, **kwargs):
         # Automatically set the solution based on the answer
@@ -69,11 +71,18 @@ class Questions(models.Model):
         option_text = getattr(self, f'option{option_number}_text')
         option_image = getattr(self, f'option{option_number}_image')
         
+        # if not self.solution_text or not self.solution_image:
         if option_image:  # If option is an image
             self.solution_image = f'Option {option_number}: Image - {option_image.url}' #
-        else:  # If option is text
-            self.solution_text = f'Option {option_number}: {option_text}'
+            # else:  # If option is text
+            #     self.solution_text = f'Option {option_number}: {option_text}'
+
+        if not self.questions_text_slug:
+            self.questions_text_slug = slugify(self.questions_text)
+
         super().save(*args, **kwargs)
+        self.added_by.no_of_questions_added = Questions.objects.filter(added_by=self.added_by).count()
+        self.added_by.save()
 
     def __str__(self) -> str:
         return f"{self.id}--{self.questions_text}"
@@ -99,7 +108,7 @@ class Exam(models.Model):
                     null=True, blank=True)
     is_active = models.BooleanField(default=True, help_text="Make Sure to Set Active-state while creating.")
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(blank = True, null = True)
     created_date = models.DateTimeField(auto_now_add=True, blank=True)
     updated_date =  models.DateTimeField(auto_now=True, blank=True)
     slug_exam = models.SlugField(blank=True)
