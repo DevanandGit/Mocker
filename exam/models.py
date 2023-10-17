@@ -48,6 +48,7 @@ class Questions(models.Model):
     id = models.BigAutoField(unique=True, primary_key=True)
     difficulty_level = models.ForeignKey(DifficultyLevel, on_delete=models.SET_NULL, null=True)
     question_type = models.ForeignKey(QuestionType, on_delete=models.SET_NULL, null=True)
+    passage = models.TextField(blank=True, null=True)
     questions_text = models.TextField(blank=True, null=True)
     questions_image = models.ImageField(upload_to='questions/images/', blank=True, null=True) #need to specify the destination in settings.py
     optionA_text = models.TextField(blank=True, null=True)
