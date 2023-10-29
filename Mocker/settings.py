@@ -27,7 +27,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['193.203.163.77']
+ALLOWED_HOSTS = ['193.203.163.77', 'mindiser.in', 'api.mindiser.in']
 
 
 # Application definition
