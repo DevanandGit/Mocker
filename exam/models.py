@@ -49,7 +49,6 @@ class Questions(models.Model):
     added_by = models.ForeignKey(RegularUser, on_delete = models.SET_NULL, null = True, editable=False)
     difficulty_level = models.ForeignKey(DifficultyLevel, on_delete=models.SET_NULL, null=True)
     question_type = models.ForeignKey(QuestionType, on_delete=models.SET_NULL, null=True)
-    passage = models.TextField(blank=True, null=True)
     questions_text = models.TextField(blank=True, null=True)
     questions_text_slug = models.TextField(blank = True, null = True, unique=True, editable = False)
     questions_image = models.ImageField(upload_to='questions/images/', blank=True, null=True) #need to specify the destination in settings.py
