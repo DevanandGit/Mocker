@@ -117,7 +117,7 @@ class AdminLoginView(APIView):
 #Admin Logout View.
 #endpoint can only be accessed if the user has authentication permission.
 class AdminLogoutView(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAdminUser]
     def post(self, request):
         if request.user.is_superuser:
             Token.objects.filter(user=request.user).delete()
@@ -130,14 +130,12 @@ class AdminLogoutView(APIView):
 #Admin accessible views.
 #View to create and List created Questions.
 class QuestionListCreateAPIView(ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = QuestionSerializer
     queryset = Questions.objects.all()
     
 
 #View to Look Questions in detail and Delete created Questions.
 class QuestionRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = QuestionSerializer
     queryset = Questions.objects.all()
     lookup_field = 'id'
@@ -145,14 +143,12 @@ class QuestionRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
 #View to create and List created Exams.
 class ExamListCreateAPIView(ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ExamSerializer
     queryset = Exam.objects.all()
 
 
 #View to Look Questions in detail and Delete created Exams.
 class ExamRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ExamDetailSerializer
     queryset = Exam.objects.all()
     lookup_field = 'exam_id'
@@ -442,7 +438,7 @@ def current_datetime(request):
 
 
 class SliderImageAdd(ListCreateAPIView):
-    permission_classes = [IsAdminUser, IsAuthenticated]
+    permission_classes = [IsAdminUser]
     serializer_class = SliderImageSerializer
     queryset = SliderImage.objects.all()
     
@@ -452,29 +448,3 @@ class SliderImageRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     serializer_class = SliderImageSerializer
     queryset = SliderImage.objects.all()
     lookup_field = "images_id"
-
-
-# class ResultValidator(APIView):
-#     def post(self, request):
-#         exam_id = request.data.get('exam_id')
-#         response = request.data.get('response')
-
-#         try:
-#             exam = Exam.objects.get(exam_id =  exam_id)
-#             # print(exam.questions.all())
-#         except Exam.DoesNotExist:
-#             response = {
-#                 "message" : "Exam Not Found"
-#             }
-#             return Response(response, status = 400)
-#         # Retrieve the questions associated with the exam
-#         questions = exam.questions.all()
-
-#         solution = SolutionCreator(questions=questions)
-#         print(solution)
-#         # print(answers)
-#         response = {
-#             "message": "Answers printed successfully"
-#         }
-#         return Response(response, status=status.HTTP_200_OK)
-
