@@ -25,10 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-# ALLOWED_HOSTS = ['193.203.163.77', 'mindiser.in', 'api.mindiser.in']
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['193.203.163.77', 'mindiser.in', 'api.mindiser.in']
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -80,19 +80,19 @@ WSGI_APPLICATION = 'Mocker.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'mocker',
-    #     'USER': 'dbdevanand',
-    #     'PASSWORD': 'dbdevanand',
-    #     'HOST': '193.203.163.77',  # or the IP address of your VPS
-    #     'PORT': '5432',           # Leave it empty for default PostgreSQL port (5432)
-    # },
-
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }   
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mocker',
+        'USER': 'dbdevanand',
+        'PASSWORD': 'dbdevanand',
+        'HOST': '193.203.163.77',  # or the IP address of your VPS
+        'PORT': '5432',           # Leave it empty for default PostgreSQL port (5432)
+    },
+
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }   
 }
 
 
