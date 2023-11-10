@@ -10,7 +10,7 @@ from rest_framework.generics import (CreateAPIView, ListCreateAPIView,
                             RetrieveUpdateDestroyAPIView, GenericAPIView, 
                             RetrieveAPIView, ListAPIView)
 from .models import (Questions, Exam, Otp,
-                      UserProfile, PurchasedDate, UserResponse, 
+                      UserProfile, PurchasedDate, UserResponse, AbstractOtp,
                       DifficultyLevel, QuestionType, RegularUser, SliderImage)
 from rest_framework import status
 from rest_framework.response import Response
@@ -31,6 +31,7 @@ import logging
 from django.http import Http404
 from django.http import JsonResponse
 from datetime import datetime
+from rest_framework.filters import SearchFilter
 logger = logging.getLogger(__name__)
 
 
@@ -156,14 +157,14 @@ class ExamRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
 #View to create and List created QuestionType
 class QuestionTypeListCreateAPIView(ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = QuestionTypeSerializer
     queryset = QuestionType.objects.all()
 
 
 #View to Look Questions in detail and Delete created QuestionType
 class QuestionTypeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = QuestionTypeSerializer
     queryset = QuestionType.objects.all()
     lookup_field = 'id'
@@ -171,14 +172,14 @@ class QuestionTypeRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
 #View to create and List created DifficultyLevel
 class DifficultyLevelListCreateAPIView(ListCreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = DifficultyLevelSerializer
     queryset = DifficultyLevel.objects.all()
 
 
 #View to Look Questions in detail and Delete created DifficultyLevel
 class DifficultyLevelRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = DifficultyLevelSerializer
     queryset = DifficultyLevel.objects.all()
     lookup_field = 'id'
@@ -271,7 +272,6 @@ class ChangePasswordView(APIView):
 
 #view to Request OTP.
 class PasswordResetRequest(GenericAPIView):
-    permission_classes = [IsAuthenticated]
     serializer_class = ResetPasswordEmailSerializer
 
     def post(self, request):
@@ -280,10 +280,11 @@ class PasswordResetRequest(GenericAPIView):
 
         email = request.data['email']
         user = RegularUser.objects.filter(email=email).first()
-
+        print(user)
         if user:
             with transaction.atomic():
                 otp_record, created = Otp.objects.get_or_create(user=user)
+                abstract_otp_record, created = AbstractOtp.objects.get_or_create(user = user)
 
                 if not created:
                     # An OTP record already exists, delete it and create a new one
@@ -291,15 +292,25 @@ class PasswordResetRequest(GenericAPIView):
                     otp_record = Otp.objects.create(user=user)
 
                 otp = otpgenerator()
+                abstract_otp = otpgenerator()
+                print(abstract_otp)
+                abstract_otp_record.abstract_otp = abstract_otp
+                abstract_otp_record.save()
                 otp_record.otp = otp
+                otp_record.otp_validated = False
                 otp_record.save()
 
-                email_body = 'Hello,\n This is the one-time-password for password reset of your account\n' + otp
-                data = {'email_body': email_body, 'to_email': user.email, 'email_subject': 'Reset your password'}
+                email_subject = 'Reset your password'
+                email_body = f"Hello,\n\nThis is your one-time password for resetting your account's password:\n\n**{otp}**\n\nUse this OTP within the next 30 minutes to complete the password reset process."
+
+                # Prepare email data and send it
+                data = {'email_body': email_body, 'to_email': user.email, 'email_subject': email_subject}
                 try:
                     Utils.send_email(data)
-
-                    return Response({'success': True, 'message': "OTP SENT SUCCESSFULLY"}, status=status.HTTP_200_OK)
+                    response = {'success': True,
+                                'message': "OTP SENT SUCCESSFULLY",
+                                'validation_id':abstract_otp}
+                    return Response(response, status=status.HTTP_200_OK)
 
                 except Exception as e:
                     logger.error(str(e))
@@ -310,18 +321,22 @@ class PasswordResetRequest(GenericAPIView):
             return Response({'success': False, 'message': "User Not Found"}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 #view to validate OTP
 class CheckOTP(APIView):
-    permission_classes = [IsAuthenticated]
     serializer_class = CheckOTPSerializer
 
     def post(self, request):
         serializer = CheckOTPSerializer(data = request.data)
         serializer.is_valid(raise_exception = True)
 
-        otp = request.data['otp']
-        user = request.user
+        otp = self.request.query_params.get('otp')
+        abstract_otp = self.request.query_params.get('validation_id')
+        try:
+            abstract_otp = AbstractOtp.objects.get(abstract_otp = abstract_otp)
+            user = abstract_otp.user
+        except AbstractOtp.DoesNotExist:
+            return Response({"OTP validation Failed"}, status=status.HTTP_401_UNAUTHORIZED )
+        
         saved_otp = Otp.objects.get(user = user)
         
         if checkOTP(otp=otp, saved_otp_instance=saved_otp):
@@ -331,18 +346,39 @@ class CheckOTP(APIView):
 
         else:
             return Response({'success':False, 'message':"INVALID OTP"}, status=status.HTTP_400_BAD_REQUEST)
-        
+           
+
 
 #View to reset password through OTP
 class ResetPasswordView(APIView):
-    permission_classes = [IsAuthenticated]
     serializer_class = ResetPasswordSerializer
 
     def post(self, request):
         serializer = ResetPasswordSerializer(data = request.data)
         serializer.is_valid(raise_exception = True)
 
-        user = request.user
+        otp = self.request.query_params.get('otp')
+        abstract_otp = self.request.query_params.get('validation_id')
+        try:
+            abstract_otp = AbstractOtp.objects.get(abstract_otp = abstract_otp)
+            user = abstract_otp.user
+        except AbstractOtp.DoesNotExist:
+            return Response({"Unauthorised User. Can't Reset Password"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            otp = Otp.objects.get(user = user)
+        except Otp.DoesNotExist:
+            return Response({"Unauthorised User. Can't Reset Password"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if otp.otp_validated == True:
+            pass
+        else:
+            response = {
+                "message": "OTP Not Validated"
+            }
+            return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user = RegularUser.objects.filter(username=user).first()
         otp_instance = Otp.objects.get(user = user)
 
         if otp_instance.otp_validated == True:
@@ -356,7 +392,7 @@ class ResetPasswordView(APIView):
 
         else:
             return Response({'success':False, 'message':"verify OTP First"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 #User Profile View.
 class UserProfileView(RetrieveAPIView):

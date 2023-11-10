@@ -101,6 +101,7 @@ class AddQuestionstoExamSerializer(serializers.Serializer):
     questions_count = serializers.IntegerField()
 
 
+
 # validates the password entered for changing password.
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
