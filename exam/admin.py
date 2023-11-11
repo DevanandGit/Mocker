@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import RegularUser,Questions, Exam, DifficultyLevel, QuestionType, Otp, UserProfile, PurchasedDate, UserResponse, SliderImage
+from .models import (RegularUser,Questions, Exam, DifficultyLevel, QuestionType, Otp, UserProfile, PurchasedDate, UserResponse, SliderImage, Feedback)
+
 # Register your models here.
 
 class QuestionsAdmin(admin.ModelAdmin):
@@ -21,3 +22,4 @@ admin.site.register(UserProfile)
 admin.site.register(PurchasedDate)
 admin.site.register(UserResponse)
 admin.site.register(SliderImage)
+admin.site.register(Feedback)

@@ -5,13 +5,15 @@ from .serializers import (RegularUserSerializer, QuestionSerializer, ExamSeriali
                           ChangePasswordSerializer,ResetPasswordEmailSerializer,
                           ResetPasswordSerializer,CheckOTPSerializer,
                           UserProfileSerializer, UserResponseSerializer,
-                          DifficultyLevelSerializer, QuestionTypeSerializer, ExamDetailSerializer, SliderImageSerializer)
+                          DifficultyLevelSerializer, QuestionTypeSerializer, ExamDetailSerializer, SliderImageSerializer, 
+                          FeedbackSerializer)
 from rest_framework.generics import (CreateAPIView, ListCreateAPIView, 
                             RetrieveUpdateDestroyAPIView, GenericAPIView, 
                             RetrieveAPIView, ListAPIView)
-from .models import (Questions, Exam, Otp,
+from .models import (Questions, Exam, Otp,Feedback,
                       UserProfile, PurchasedDate, UserResponse, AbstractOtp,
                       DifficultyLevel, QuestionType, RegularUser, SliderImage)
+from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -186,7 +188,7 @@ class DifficultyLevelRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     
 #View to add questions to exams randomnly
 class AddQuestionstoExam(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAdminUser]
     serializer_class = AddQuestionstoExamSerializer
 
     def post(self, request):
@@ -221,7 +223,8 @@ class AddQuestionstoExam(APIView):
 
 #view to assign a exam to a user.
 class AssignExam(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAdminUser]
+    
     def post(self, request):
         #get exam id and username of the user.
         username = request.data.get('username')
@@ -230,10 +233,12 @@ class AssignExam(APIView):
         #get associated user and examprint
         try:
             exam = Exam.objects.get(exam_id = exam_id)
-            user = User.objects.get(username = username)
+            user = RegularUser.objects.get(username = username)
         except User.DoesNotExist:
+
             return Response("User not found", status=status.HTTP_404_NOT_FOUND)
         except Exam.DoesNotExist:
+
             return Response("Exam not found", status=status.HTTP_404_NOT_FOUND)
                 
         duration = int(request.data.get('duration')) #duration in days
@@ -425,9 +430,15 @@ class UserExamResponseAdd(APIView):
 
         exam_id = validated_data.get('exam_id')
         user_response_data = validated_data.get('response')
+        time_taken = validated_data.get('time_taken')
 
         try:
             exam = Exam.objects.get(exam_id =  exam_id)
+            exam_name = exam.exam_name
+            qualify_score = exam.qualify_score
+            print(exam_name)
+            print(qualify_score)
+
             # print(exam.questions.all())
         except Exam.DoesNotExist:
             response = {
@@ -436,15 +447,18 @@ class UserExamResponseAdd(APIView):
             return Response(response, status = 400)
         
         questions = exam.questions.all()
-        print(questions)
+        # print(questions)
         solution = SolutionCreator(questions=questions)
-        print(solution)
+        # print(solution)
         marks = resultvalidator(response=user_response_data, solution=solution, exam=exam)
                                 
         try:
             user_response = UserResponse.objects.create(
                 user=user,
                 exam_id=exam_id,
+                exam_name = exam_name,
+                qualify_score = qualify_score,
+                time_taken = time_taken,
                 response=user_response_data,
                 marks_scored=marks,
             )
@@ -453,6 +467,9 @@ class UserExamResponseAdd(APIView):
                 "message": "User response added successfully",
                 'data': {
                     'exam_id': exam_id,
+                    'exam_name':exam_name,
+                    'qualify_score':qualify_score,
+                    'time_taken':time_taken,
                     'response':user_response_data,
                     'marks_scored': marks,
                 },
@@ -480,7 +497,24 @@ class SliderImageAdd(ListCreateAPIView):
     
     
 class SliderImageRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAdminUser, IsAuthenticated]
+    permission_classes = [IsAdminUser]
     serializer_class = SliderImageSerializer
     queryset = SliderImage.objects.all()
     lookup_field = "images_id"
+
+
+
+class FeedbackView(ListCreateAPIView):
+    serializer_class = FeedbackSerializer
+    queryset = Feedback.objects.all()
+
+
+# a = {
+#     "33": "C", "34": "B", "35": "B", 
+#     "36": "A", "37": "B", "38": "C", 
+#     "41": "B", "42": "B", "43": "B", 
+#     "44": "B", "45": "D", "46": "A", 
+#     "47": "D", "48": "C", "49": "B",
+#     "50": "C", "51": "B", "52": "C",
+#     "53": "D", "54": "B", "71": "D"
+#     }

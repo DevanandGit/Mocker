@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (Exam, Questions, PurchasedDate, 
                      UserProfile, UserResponse, DifficultyLevel, 
-                     QuestionType, RegularUser, SliderImage)
+                     QuestionType, RegularUser, SliderImage, Feedback)
 
 
 #validate data of regular user login.
@@ -180,7 +180,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserResponse
-        fields = ['exam_id','response','marks_scored']
+        fields = ['exam_id', 'exam_name', 'qualify_score', 'time_taken', 'response', 'marks_scored']
 
 
 #serializer to validate the userregistration data.
@@ -239,3 +239,9 @@ class SliderImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = SliderImage
         fields = ['images_id','images']
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = "__all__"

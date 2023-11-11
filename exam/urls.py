@@ -7,8 +7,8 @@ from .views import (RegularUserRegistration, RegularUserLoginView, RegularUserLo
                     AssignExam, UserProfileView, PurchaseHistoryView, UserExamResponseAdd, 
                     QuestionTypeListCreateAPIView, QuestionTypeRetrieveUpdateDestroyAPIView, 
                     DifficultyLevelListCreateAPIView, DifficultyLevelRetrieveUpdateDestroyAPIView,
-                    SliderImageAdd, SliderImageRetrieveUpdateDestroyView)
-
+                    SliderImageAdd, SliderImageRetrieveUpdateDestroyView, FeedbackView)
+from rest_framework.routers import DefaultRouter
 from .views import current_datetime
 urlpatterns = [
     path('user-reg/', RegularUserRegistration.as_view(), name = 'user-reg'),
@@ -43,5 +43,8 @@ urlpatterns = [
     path('otp-request/', PasswordResetRequest.as_view(), name='otp-request'),
     path('check-otp/', CheckOTP.as_view()),
     path('reset-password/', ResetPasswordView.as_view()),
+
+    path('feedback-add/', FeedbackView.as_view(), name='feedback-add'),
+
 
 ]

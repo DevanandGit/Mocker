@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-
+from datetime import timedelta
 
 class RegularUser(AbstractUser):
     username = models.CharField(max_length=100, validators=[RegexValidator(
@@ -103,7 +103,7 @@ class Exam(models.Model):
     negetive_marks = models.PositiveSmallIntegerField(default=0)
     department = models.CharField(max_length=150, null=True, blank=True)
     semester = models.IntegerField(
-        validators=[MinValueValidator(1, message="Value must be between 1 and 8"),
+    validators=[MinValueValidator(1, message="Value must be between 1 and 8"),
                     MaxValueValidator(8, message="Value must be between 1 and 8"),],
                     null=True, blank=True)
     is_active = models.BooleanField(default=True, help_text="Make Sure to Set Active-state while creating.")
@@ -156,15 +156,19 @@ class PurchasedDate(models.Model):
 class UserResponse(models.Model):
     user = models.ForeignKey(RegularUser, on_delete=models.CASCADE, related_name='userresponse')
     exam_id = models.CharField(max_length=50)
+    exam_name = models.CharField(max_length=150, default='test-1')
+    qualify_score = models.PositiveIntegerField(default=0)
+    time_taken = models.CharField(max_length=30, default="00:00:00")
     response = models.JSONField(default=dict)
     marks_scored = models.CharField(max_length=4, default='00')
+
     #  {
     # "1": "A",
     # "2": "C",
     # "3": "B",
     # }
     def __str__(self) -> str:
-        return f"{self.userprofile.username}-{self.exam_id}"
+        return f"{self.exam_id}"
     
 
     # models to add slider image
@@ -179,3 +183,7 @@ class SliderImage(models.Model):
 
     def save(self, *args, **kwargs):
         return super().save(*args, **kwargs)
+    
+
+class Feedback(models.Model):
+    feedback = models.TextField()
