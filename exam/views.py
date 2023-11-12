@@ -13,6 +13,7 @@ from rest_framework.generics import (CreateAPIView, ListCreateAPIView,
 from .models import (Questions, Exam, Otp,Feedback,
                       UserProfile, PurchasedDate, UserResponse, AbstractOtp,
                       DifficultyLevel, QuestionType, RegularUser, SliderImage)
+from django.views.generic import TemplateView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from rest_framework.response import Response
@@ -508,6 +509,13 @@ class FeedbackView(ListCreateAPIView):
     serializer_class = FeedbackSerializer
     queryset = Feedback.objects.all()
 
+
+
+class PrivacyPolicy(TemplateView):
+    template_name = 'privacy_policy.html'
+
+class TermsAndConditions(TemplateView):
+    template_name = 'terms_and_condition.html'
 
 # a = {
 #     "33": "C", "34": "B", "35": "B", 

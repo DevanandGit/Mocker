@@ -8,6 +8,11 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 
+
+def calculate_end_date():
+    return timezone.now() + timedelta(days=365)
+
+
 class RegularUser(AbstractUser):
     username = models.CharField(max_length=100, validators=[RegexValidator(
         r'^(PRP|prp)[1-9]{2}[A-Z]{2}[0-9]{3}$'
@@ -19,6 +24,8 @@ class RegularUser(AbstractUser):
             MaxValueValidator(8, message="Value must be between 1 and 8"),
         ], null=True)
     no_of_questions_added = models.PositiveIntegerField(default = 0)
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default=calculate_end_date, blank=True, null=True)
     USERNAME_FIELD = 'username'
     class Meta:
         db_table = 'exam_RegularUser'

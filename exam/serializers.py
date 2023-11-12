@@ -2,7 +2,8 @@ from rest_framework import serializers
 from .models import (Exam, Questions, PurchasedDate, 
                      UserProfile, UserResponse, DifficultyLevel, 
                      QuestionType, RegularUser, SliderImage, Feedback)
-
+from datetime import timedelta
+from django.utils import timezone
 
 #validate data of regular user login.
 class RegularUserLoginSerializer(serializers.Serializer):
@@ -204,7 +205,7 @@ class RegularUserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = RegularUser
-        fields = ['first_name', 'last_name', 'username', 'email','password', 'confirm_password', 'department', 'semester', 'purchase_list', 'exam_response']
+        fields = ['first_name', 'last_name', 'username', 'email','password', 'confirm_password', 'department', 'semester', 'start_date','end_date','purchase_list', 'exam_response']
     
     def to_representation(self, instance):
         # Include the logged-in user's exam responses in the representation
@@ -221,6 +222,9 @@ class RegularUserSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data.pop('confirm_password')
+        start_date = timezone.now().date()
+        end_date = start_date + timedelta(days=365)
+
         user = RegularUser.objects.create_user(
             first_name = validated_data['first_name'],
             last_name = validated_data['last_name'],
@@ -228,8 +232,9 @@ class RegularUserSerializer(serializers.ModelSerializer):
             username = validated_data['username'],
             password = validated_data['password'],
             department = validated_data['department'],
-            semester = validated_data['semester']
-
+            semester = validated_data['semester'],
+            start_date=start_date,
+            end_date=end_date,
         )
         return user
     

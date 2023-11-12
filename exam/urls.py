@@ -7,7 +7,7 @@ from .views import (RegularUserRegistration, RegularUserLoginView, RegularUserLo
                     AssignExam, UserProfileView, PurchaseHistoryView, UserExamResponseAdd, 
                     QuestionTypeListCreateAPIView, QuestionTypeRetrieveUpdateDestroyAPIView, 
                     DifficultyLevelListCreateAPIView, DifficultyLevelRetrieveUpdateDestroyAPIView,
-                    SliderImageAdd, SliderImageRetrieveUpdateDestroyView, FeedbackView)
+                    SliderImageAdd, SliderImageRetrieveUpdateDestroyView, FeedbackView, PrivacyPolicy, TermsAndConditions)
 from rest_framework.routers import DefaultRouter
 from .views import current_datetime
 urlpatterns = [
@@ -45,6 +45,8 @@ urlpatterns = [
     path('reset-password/', ResetPasswordView.as_view()),
 
     path('feedback-add/', FeedbackView.as_view(), name='feedback-add'),
+    path('privacy-policy', PrivacyPolicy.as_view(), name = 'privacy-policy'),
+    path('terms-and-conditions', TermsAndConditions.as_view(), name = 'terms-and-conditions')
 
 
 ]
