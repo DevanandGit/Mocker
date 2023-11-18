@@ -35,6 +35,7 @@ from django.http import Http404
 from django.http import JsonResponse
 from datetime import datetime
 from rest_framework.filters import SearchFilter
+import pandas as pd
 logger = logging.getLogger(__name__)
 
 
@@ -67,6 +68,34 @@ class RegularUserRegistration(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
+#view to handle excel file for user registration.
+class UserRegistrationThroughExcel(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        file = request.FILES['file']
+        df = pd.read_excel(file)
+
+        success_users = []
+        errors = []
+
+        for index, row in df.iterrows():
+            serializer = RegularUserSerializer(data=row.to_dict())
+            if serializer.is_valid():
+                serializer.save()
+                success_users.append(serializer.data)
+            else:
+                errors.append({
+                    'row_number': index + 2,  # Excel rows are 1-indexed, Python is 0-indexed
+                    'errors': serializer.errors
+                })
+
+        if errors:
+            return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'success_users': success_users}, status=status.HTTP_201_CREATED)
+
 
 #Regular User login view.
 class RegularUserLoginView(APIView):
@@ -299,7 +328,7 @@ class PasswordResetRequest(GenericAPIView):
 
                 otp = otpgenerator()
                 abstract_otp = otpgenerator()
-                print(abstract_otp)
+                # print(abstract_otp)
                 abstract_otp_record.abstract_otp = abstract_otp
                 abstract_otp_record.save()
                 otp_record.otp = otp

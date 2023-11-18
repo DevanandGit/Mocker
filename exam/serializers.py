@@ -7,7 +7,7 @@ from django.utils import timezone
 
 #validate data of regular user login.
 class RegularUserLoginSerializer(serializers.Serializer):
-    username = serializers.RegexField(regex=r'^(PRP|prp)[1-9]{2}[A-Z]{2}[0-9]{3}$', help_text = 'Username should be your college reg-number starting with PRP')
+    username = serializers.RegexField(regex=r'^(PRP|prp)[0-9]{2}([A-Za-z]{2}|[0-9]{2})[0-9]{3}$', help_text = 'Username should be your college reg-number starting with PRP')
     password = serializers.CharField(max_length=128)
 
 
@@ -198,7 +198,7 @@ class RegularUserSerializer(serializers.ModelSerializer):
 
     confirm_password = serializers.CharField(write_only=True)
 
-    username = serializers.RegexField(regex=r'^(PRP|prp)[1-9]{2}[A-Z]{2}[0-9]{3}$', help_text = 'Enter a valid PRP code')
+    username = serializers.RegexField(regex=r'^(PRP|prp)[0-9]{2}([A-Za-z]{2}|[0-9]{2})[0-9]{3}$', help_text = 'Enter a valid PRP code')
 
     purchase_list = UserProfileSerializer(source = 'user_profile', read_only = True)
     exam_response = UserResponseSerializer(read_only = True)
