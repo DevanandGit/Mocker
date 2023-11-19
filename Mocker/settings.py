@@ -132,10 +132,10 @@ AUTH_USER_MODEL = 'exam.RegularUser'
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = '/usr/local/lsws/Mocker/myenv/Mocker/public/static/'
+STATIC_ROOT = '/usr/local/lsws/Mocker/myenv/public/static/'
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = '/usr/local/lsws/Mocker/myenv/Mocker/public/media/'
+MEDIA_ROOT = '/usr/local/lsws/Mocker/myenv/public/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
