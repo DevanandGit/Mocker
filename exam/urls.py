@@ -7,7 +7,8 @@ from .views import (RegularUserRegistration, RegularUserLoginView, RegularUserLo
                     AssignExam, UserProfileView, PurchaseHistoryView, UserExamResponseAdd, 
                     QuestionTypeListCreateAPIView, QuestionTypeRetrieveUpdateDestroyAPIView, 
                     DifficultyLevelListCreateAPIView, DifficultyLevelRetrieveUpdateDestroyAPIView,
-                    SliderImageAdd, SliderImageRetrieveUpdateDestroyView, FeedbackView, PrivacyPolicy, TermsAndConditions, UserRegistrationThroughExcel)
+                    SliderImageAdd, SliderImageRetrieveUpdateDestroyView, FeedbackView, PrivacyPolicy, 
+                    TermsAndConditions, UserRegistrationThroughExcel, UpdateValidity)
 from rest_framework.routers import DefaultRouter
 from .views import current_datetime
 urlpatterns = [
@@ -49,6 +50,10 @@ urlpatterns = [
     path('terms-and-conditions', TermsAndConditions.as_view(), name = 'terms-and-conditions'),
 
     path('reg-as-group/', UserRegistrationThroughExcel.as_view(), name='upload-excel'),
+    path('update-date/', UpdateValidity.as_view(), name = 'update-date'),
+
+    # path('user-list/', regularUserList.as_view(), name='user-list'),
+
 
 
 ]

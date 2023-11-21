@@ -71,7 +71,7 @@ class RegularUserRegistration(APIView):
 
 #view to handle excel file for user registration.
 class UserRegistrationThroughExcel(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
     def post(self, request):
         file = request.FILES['file']
@@ -95,6 +95,40 @@ class UserRegistrationThroughExcel(APIView):
             return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'success_users': success_users}, status=status.HTTP_201_CREATED)
+
+
+#view to update valididty of user.
+class UpdateValidity(APIView):
+    permission_classes = [IsAdminUser]
+    
+    def post(self, request):
+        file = request.FILES['file']
+        df = pd.read_excel(file)
+
+        unsuccessfull_updates = []
+
+        for index, row in df.iterrows():
+            username = row['username']
+            date = row['date']
+            print(date)
+            print(type(date))
+
+            try:
+                user = RegularUser.objects.get(username = username)
+                if user:
+                    user.end_date = date
+                    user.save()
+            except RegularUser.DoesNotExist:
+                unsuccessfull_updates.append(username)
+        
+        response = {'unsuccessfull_updates':unsuccessfull_updates,}
+        
+        return Response(response, status = status.HTTP_201_CREATED)
+
+
+# class regularUserList(ListAPIView):
+#     queryset = RegularUser.objects.all()
+#     serializer_class = RegularUserSerializer
 
 
 #Regular User login view.

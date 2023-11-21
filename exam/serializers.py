@@ -223,7 +223,11 @@ class RegularUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('confirm_password')
         start_date = timezone.now().date()
-        end_date = start_date + timedelta(days=365)
+        if not validated_data['end_date']:
+            end_date = start_date + timedelta(days=365)
+        else:
+            end_date = validated_data['end_date']
+        
 
         user = RegularUser.objects.create_user(
             first_name = validated_data['first_name'],
