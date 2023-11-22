@@ -205,7 +205,7 @@ class RegularUserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = RegularUser
-        fields = ['first_name', 'last_name', 'username', 'email','password', 'confirm_password', 'department', 'semester', 'start_date','end_date','purchase_list', 'exam_response']
+        fields = ['first_name', 'username', 'email','password', 'confirm_password', 'department', 'semester', 'start_date','end_date','purchase_list', 'exam_response']
     
     def to_representation(self, instance):
         # Include the logged-in user's exam responses in the representation
@@ -228,10 +228,10 @@ class RegularUserSerializer(serializers.ModelSerializer):
         else:
             end_date = validated_data['end_date']
         
-
+        print(end_date)
         user = RegularUser.objects.create_user(
             first_name = validated_data['first_name'],
-            last_name = validated_data['last_name'],
+            # last_name = validated_data['last_name'],
             email = validated_data['email'],
             username = validated_data['username'],
             password = validated_data['password'],

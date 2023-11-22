@@ -81,6 +81,9 @@ class UserRegistrationThroughExcel(APIView):
         errors = []
 
         for index, row in df.iterrows():
+            if isinstance(row['end_date'], datetime):
+                row['end_date'] = row['end_date'].date()
+                
             serializer = RegularUserSerializer(data=row.to_dict())
             if serializer.is_valid():
                 serializer.save()
