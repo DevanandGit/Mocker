@@ -15,7 +15,7 @@ def calculate_end_date():
 
 class RegularUser(AbstractUser):
     username = models.CharField(max_length=100, validators=[RegexValidator(
-        r'^(PRP|prp)[0-9]{2}([A-Za-z]{2}|[0-9]{2})[0-9]{3}$'
+       r'^(PRP|prp|LPRP|lprp)[0-9]{2}([A-Za-z]{2}|[0-9]{2})[0-9]{3}$'
     )], unique=True)
     department = models.CharField(max_length=150)
     semester = models.IntegerField(
